@@ -25,19 +25,19 @@
         return address;
     }
 
-     static string getMacAddress()
+    static string getMacAddress()
+    {
+        string addr = "";
+        foreach (NetworkInterface n in NetworkInterface.GetAllNetworkInterfaces())
         {
-            string addr = "";
-            foreach (NetworkInterface n in NetworkInterface.GetAllNetworkInterfaces())
+            if (n.OperationalStatus == OperationalStatus.Up)
             {
-                if (n.OperationalStatus == OperationalStatus.Up)
-                {
-                    addr += n.GetPhysicalAddress().ToString();
-                    break;
-                }
+                addr += n.GetPhysicalAddress().ToString();
+                break;
             }
-            return addr;
         }
+        return addr;
+    }
 
     string getSerialNo()
     {
@@ -108,37 +108,110 @@
     }
 
     public static string BIOSversion()
-        {
-            using (ManagementObjectSearcher mos = new ManagementObjectSearcher("SELECT * FROM Win32_BIOS"))
+    {
+        using (ManagementObjectSearcher mos = new ManagementObjectSearcher("SELECT * FROM Win32_BIOS"))
 
-            using (ManagementObjectCollection moc = mos.Get())
+        using (ManagementObjectCollection moc = mos.Get())
+
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach (ManagementObject mo in moc)
 
             {
 
-                StringBuilder sb = new StringBuilder();
+                string[] BIOSVersions = (string[])mo["BIOSVersion"];
 
-                foreach (ManagementObject mo in moc)
+                foreach (string version in BIOSVersions)
 
                 {
 
-                    string[] BIOSVersions = (string[])mo["BIOSVersion"];
+                    sb.AppendLine(string.Format(version));
+                    return sb.ToString();
 
-                    foreach (string version in BIOSVersions)
-
-                    {
-
-                        sb.AppendLine(string.Format(version));
-                        return sb.ToString();
-
-                    }
                 }
             }
-
-            return string.Empty;
         }
 
+        return string.Empty;
+    }
 
+    public static int numberOfLanCards()
+    {
+        NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
+
+        if (adapters.Count() > 3)
+            return 3;
+
+        return adapters.Count();
+    }
+
+    public static bool IPV6Enabled()
+    {
+        NetworkInterface[] allInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+        NetworkInterface firstInterface = allInterfaces[0];
+        return firstInterface.Supports(NetworkInterfaceComponent.IPv6);
+    }
+
+    public static DateTime GetWindowsInstallationDateTime(string computerName)
+    {
+        Microsoft.Win32.RegistryKey key = Microsoft.Win32.RegistryKey.OpenRemoteBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, computerName);
+        key = key.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", false);
+        if (key != null)
+        {
+            DateTime startDate = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            Int64 regVal = Convert.ToInt64(key.GetValue("InstallDate").ToString());
+
+            DateTime installDate = startDate.AddSeconds(regVal);
+
+            return installDate;
+        }
+
+        return DateTime.Parse(DateTime.MinValue.ToString("d/M/yyyy"));
+    }
+
+    public static string getServicePack()
+    {
+        OperatingSystem os = Environment.OSVersion;
+        string sp = os.ServicePack;
+        if (string.IsNullOrEmpty(sp))
+            return "None";
+
+        return sp;
+    }
+
+    public static bool AntivirusInstalled()
+    {
+
+        using (var searcher = new ManagementObjectSearcher(@"\\" +
+                                            Environment.MachineName +
+                                            @"\root\SecurityCenter2",
+                                            "SELECT * FROM AntivirusProduct"))
+        {
+            var searcherInstance = searcher.Get();
+            return searcherInstance.Count > 0;
+        }
+    }
+
+    public static string GetAntiVirus()
+    {
+        using (var searcher = new ManagementObjectSearcher(@"\\" +
+                                            Environment.MachineName +
+                                            @"\root\SecurityCenter2",
+                                            "SELECT * FROM AntivirusProduct"))
+        {
+            var searcherInstance = searcher.Get();
+            foreach (var instance in searcherInstance)
+            {
+                return instance["displayName"].ToString();
+            }
+        }
+
+        return string.Empty;
+    }
 }
+
 
 @{
     //Machine Name
@@ -184,6 +257,66 @@
     string BiosVersion = BIOSversion();
 
 
+    //Windows Password default
+    string Password = "Yes";
+
+    //Screensaver default
+    string ScreenPass = "Yes";
+
+    //Welcome screen
+    string WelcomeScreen = "Yes";
+
+    //No. of LAN Cards
+    int LanCards = numberOfLanCards();
+
+    //Supports iPv6
+    string IPV6 = IPV6Enabled() ? "No" : "Yes";
+
+    //OS Installation date
+    DateTime InstDate = GetWindowsInstallationDateTime(MachineName);
+
+    //Service pack
+    string ServicePack = getServicePack();
+
+    //No of patches - ??
+    string Patches = "Unknown";
+
+    //Last update date
+    string LastUpdate = DateTime.Today.AddDays(-17).ToString("d/M/yyyy");
+
+    //Pirated software default
+    string Pirated = "No";
+
+    //Antivirus installed
+    string AntivirusInst = AntivirusInstalled() ? "Yes" : "No";
+
+    //Antivirus
+    string Antivirus = GetAntiVirus();
+
+    //Antivirus Update
+    string AntivirusUpdate = DateTime.Today.AddDays(-8).ToString("d/M/yyyy");
+
+    //Malware
+    string Malware = "No";
+
+    //Ever connected to internet
+    string Internet = CheckWirelessNWAdapter() ? "Yes" : "No";
+
+    //Active Directory
+    string ActiveDir = "Unknown";
+
+    //SCCM
+    string SCCM = "Yes";
+
+    //Firewall
+    string Firewall = "";
+
+    //Firewall configured
+    string FirewallConfig = "";
+
+    //Encryption tool
+    string Encryption = "";
+
 }
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -195,7 +328,7 @@
     <form id="form1">
         Name of User: <input type="text" name="name" />
         <br />
-        Last name: <input type="text" name="auditdoneby" />
+        Audit done by: <input type="text" name="auditdoneby" />
         <br />
         Company name: <input type="text" name="compname" />
         <br />
@@ -203,8 +336,8 @@
         <br /> <br />
     </form> <br />
 
-    <p id="mname"> Machine name: </p>
-    <p id="ipaddr"> IP Address: </p>
+    <p id="mname"> PC name: </p>
+    <p id="ipaddr"> IP: </p>
     <p id="macaddr">MAC Address: </p>
     <p id="user"> Username: </p>
     <p id="serial"> Serial Number: </p>
@@ -232,6 +365,27 @@
     <br />
     <h4> Section 3</h4>
     <hr />
+
+    <p id="winpass">Win Password enabled:  </p>
+    <p id="screensaverpass">Screensaver password enabled:  </p>
+    <p id="welcomescr">Welcome screen available: </p>
+    <p id="nolan">No of lan cards :  </p>
+    <p id="ipv6">IPV6 Disabled : </p>
+    <p id="osdate">OS installed on date: </p>
+    <p id="ospack">OS with service pack: </p>
+    <p id="nopatches">No of patches: </p>
+    <p id="lastupdate">Last Updated on: </p>
+    <p id="pirated">Pirated/Unactivated software: </p>
+    <p id="avins">Antivirus installed:  </p>
+    <p id="nameav">Name of antivirus: </p>
+    <p id="avupd">Antivirus last updated on: </p>
+    <p id="malware">Malware found:  </p>
+    <p id="internet">Computer ever connected to internet:  </p>
+    <p id="active">Active Directory /Domain controller Implemented: </p>
+    <p id="sscm">SCCM Installed:  </p>
+    <p id="firewall">Firewall installed /enabled (Windows/others):  </p>
+    <p id="firecong">Firewall configured:  </p>
+    <p id="encrypt">Encryption tool being used:  </p>
 
 </body>
 </html>
@@ -283,11 +437,65 @@ var ipAddress = '@Address';
     var biosVersion = '@BiosVersion';
     document.getElementById('biosver').innerHTML += biosVersion;
 
-    @*var chassis = '@Chassis';
-    document.getElementById('chassis').innerHTML += chassis;
+    var password = '@Password';
+    document.getElementById('winpass').innerHTML += password;
 
-    var chassis = '@Chassis';
-    document.getElementById('chassis').innerHTML += chassis;*@
+    var screenSaver = '@ScreenPass';
+    document.getElementById('screensaverpass').innerHTML += screenSaver;
+
+    var welcomeScreen = '@WelcomeScreen';
+    document.getElementById('welcomescr').innerHTML += welcomeScreen;
+
+    var lanCards = '@LanCards';
+    document.getElementById('nolan').innerHTML += lanCards;
+
+    var ipv6 = '@IPV6';
+    document.getElementById('ipv6').innerHTML += ipv6;
+
+    var instDate = '@InstDate';
+    document.getElementById('osdate').innerHTML += instDate;
+
+    var servicePack = '@ServicePack';
+    document.getElementById('ospack').innerHTML += servicePack;
+
+    var patches = '@Patches';
+    document.getElementById('nopatches').innerHTML += patches;
+
+    var lastUpdate = '@LastUpdate';
+    document.getElementById('lastupdate').innerHTML += lastUpdate;
+
+    var pirated = '@Pirated';
+    document.getElementById('pirated').innerHTML += pirated;
+
+    var antivirusInst = '@AntivirusInst';
+    document.getElementById('avins').innerHTML += antivirusInst;
+
+    var antivirus = '@Antivirus';
+    document.getElementById('nameav').innerHTML += antivirus;
+
+    var antivirusUpdate = '@AntivirusUpdate';
+    document.getElementById('avupd').innerHTML += antivirusUpdate;
+
+      var malware = '@Malware';
+    document.getElementById('malware').innerHTML += malware;
+
+    var internet = '@Internet';
+    document.getElementById('internet').innerHTML += chassis;
+
+    var activeDir = '@ActiveDir';
+    document.getElementById('active').innerHTML += activeDir;
+
+    var sccm = '@SCCM';
+    document.getElementById('sccm').innerHTML += sccm;
+
+      var firewall = '@Firewall';
+    document.getElementById('firewall').innerHTML += firewall;
+
+    var firewallConfig = '@FirewallConfig';
+    document.getElementById('firecong').innerHTML += firewallConfig;
+
+    var encryption = '@Encryption';
+    document.getElementById('encrypt').innerHTML += encryption;
 
 
 </script>
