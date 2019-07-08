@@ -6,6 +6,8 @@
 
 @using System.Net;
 @using System.Management;
+@using System.Net.NetworkInformation;
+@using System.Text;
 
 @functions
 {
@@ -22,6 +24,20 @@
 
         return address;
     }
+
+     static string getMacAddress()
+        {
+            string addr = "";
+            foreach (NetworkInterface n in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (n.OperationalStatus == OperationalStatus.Up)
+                {
+                    addr += n.GetPhysicalAddress().ToString();
+                    break;
+                }
+            }
+            return addr;
+        }
 
     string getSerialNo()
     {
@@ -58,11 +74,71 @@
         return string.Empty;
     }
 
+    private static bool CheckCardReader()
+    {
 
+        ManagementObjectCollection collection;
+        using (var searcher = new ManagementObjectSearcher(@"Select * From Win32_PnPEntity"))
+            collection = searcher.Get();
+
+        return collection != null;
+    }
+
+    public static bool CheckWirelessNWAdapter()
+    {
+        try
+        {
+            using (var client = new WebClient())
+            using (client.OpenRead("http://clients3.google.com/generate_204"))
+            {
+                return true;
+            }
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public static bool CheckMultiBoot()
+    {
+        var os = Environment.OSVersion;
+
+        return os.Version.Minor > 1;
+    }
+
+    public static string BIOSversion()
+        {
+            using (ManagementObjectSearcher mos = new ManagementObjectSearcher("SELECT * FROM Win32_BIOS"))
+
+            using (ManagementObjectCollection moc = mos.Get())
+
+            {
+
+                StringBuilder sb = new StringBuilder();
+
+                foreach (ManagementObject mo in moc)
+
+                {
+
+                    string[] BIOSVersions = (string[])mo["BIOSVersion"];
+
+                    foreach (string version in BIOSVersions)
+
+                    {
+
+                        sb.AppendLine(string.Format(version));
+                        return sb.ToString();
+
+                    }
+                }
+            }
+
+            return string.Empty;
+        }
 
 
 }
-
 
 @{
     //Machine Name
@@ -74,6 +150,8 @@
     //Username
     string UserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
 
+    string MacAddress = getMacAddress();
+
     //Serial Number
     string SerialNo = getSerialNo();
 
@@ -84,6 +162,27 @@
     string BiosPass = "Yes";
     string BiosHard = "Yes";
 
+    //Card reader
+    string CardReader = CheckCardReader() ? "No" : "Yes";
+
+    //WirelessNW
+    string WirelessNW = CheckWirelessNWAdapter() ? "No" : "Yes";
+
+    //MultipleNW
+    string MultipleNW = CheckWirelessNWAdapter() ? "No" : "Yes";
+
+    //Multiple Booting
+    string MultiBooting = CheckMultiBoot() ? "No" : "Yes";
+
+    //Wake on LAN default
+    string WakeOnLan = "No";
+
+    //Chassis default
+    string Chassis = "Yes";
+
+    //BIOS version
+    string BiosVersion = BIOSversion();
+
 
 }
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -92,6 +191,7 @@
     <title></title>
 </head>
 <body>
+
     <form id="form1">
         Name of User: <input type="text" name="name" />
         <br />
@@ -101,10 +201,11 @@
         <br />
         Position: <input type="text" name="position" />
         <br /> <br />
-    </form>
+    </form> <br />
 
     <p id="mname"> Machine name: </p>
     <p id="ipaddr"> IP Address: </p>
+    <p id="macaddr">MAC Address: </p>
     <p id="user"> Username: </p>
     <p id="serial"> Serial Number: </p>
     <p id="makemod"> Make and Model: </p>
@@ -120,6 +221,18 @@
     <h4> Section 2</h4>
     <hr />
 
+    <p id="cardreader">Card reader disabled: </p>
+    <p id="wirelessnw">Wireless nw adapter disabled: </p>
+    <p id="multiplenw">Multiple nw card disabled: </p>
+    <p id="multiboot">Multiple booting disabled: </p>
+    <p id="wakeonlan">Wake on lan disabled: </p>
+    <p id="chassis">Chassis intrution enabled: </p>
+    <p id="biosver">Bios version: </p>
+
+    <br />
+    <h4> Section 3</h4>
+    <hr />
+
 </body>
 </html>
 
@@ -130,6 +243,9 @@ var machineName = '@MachineName';
 
 var ipAddress = '@Address';
     document.getElementById('ipaddr').innerHTML += ipAddress;
+
+    var macAddr = '@MacAddress';
+    document.getElementById('macaddr').innerHTML += macAddr;
 
     var userName = '@UserName';
     document.getElementById('user').innerHTML += userName;
@@ -146,13 +262,32 @@ var ipAddress = '@Address';
     var biosHard = '@BiosHard';
     document.getElementById('bioshard').innerHTML += biosHard;
 
-      @*var userName = '@UserName';
-    document.getElementById('user').innerHTML += userName;
+      var cardReader = '@CardReader';
+    document.getElementById('cardreader').innerHTML += cardReader;
 
-     var userName = '@UserName';
-    document.getElementById('user').innerHTML += userName;*@
+    var wirelessNW = '@WirelessNW';
+    document.getElementById('wirelessnw').innerHTML += wirelessNW;
 
+    var multiNW = '@MultipleNW';
+    document.getElementById('multiplenw').innerHTML += multiNW;
 
+    var multiBoot = '@MultiBooting';
+    document.getElementById('multiboot').innerHTML += multiBoot;
+
+      var wakeonLan = '@WakeOnLan';
+    document.getElementById('wakeonlan').innerHTML += wakeonLan;
+
+    var chassis = '@Chassis';
+    document.getElementById('chassis').innerHTML += chassis;
+
+    var biosVersion = '@BiosVersion';
+    document.getElementById('biosver').innerHTML += biosVersion;
+
+    @*var chassis = '@Chassis';
+    document.getElementById('chassis').innerHTML += chassis;
+
+    var chassis = '@Chassis';
+    document.getElementById('chassis').innerHTML += chassis;*@
 
 
 </script>
