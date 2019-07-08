@@ -1,1 +1,1 @@
-Web App
+Fetching system information
