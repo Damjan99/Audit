@@ -1,0 +1,148 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+@using System.Net;
+@using System.Management;
+
+@functions
+{
+    //IP Address
+    string getIP()
+    {
+
+        string strHostName = string.Empty;
+        strHostName = Dns.GetHostName();
+        Console.WriteLine("Local Machine's Host Name: " + strHostName);
+        IPHostEntry ipEntry = Dns.GetHostEntry(strHostName);
+        IPAddress[] addr = ipEntry.AddressList;
+        var address = addr.Select(x => x.ToString()).OrderBy(x => x.Length).FirstOrDefault();
+
+        return address;
+    }
+
+    string getSerialNo()
+    {
+        ManagementObjectSearcher searcher = new ManagementObjectSearcher("select * from Win32_Processor");
+        string collectedInfo = ""; // here we will put the informa
+
+        searcher.Query = new ObjectQuery("select * from Win32_BIOS");
+        foreach (ManagementObject share in searcher.Get())
+        {
+            //then, the serial number of BIOS
+            collectedInfo += share.GetPropertyValue("SerialNumber").ToString();
+        }
+        return collectedInfo;
+    }
+
+
+    string getMakeAndModel()
+    {
+        string sModel;
+        // create management class object
+        ManagementClass mc = new ManagementClass("Win32_ComputerSystem");
+        //collection to store all management objects
+        ManagementObjectCollection moc = mc.GetInstances();
+        if (moc.Count != 0)
+        {
+            foreach (ManagementObject mo in mc.GetInstances())
+            {
+                // display general system information
+               sModel =  mo["Manufacturer"].ToString();
+               return sModel;
+            }
+        }
+
+        return string.Empty;
+    }
+
+
+
+
+}
+
+
+@{
+    //Machine Name
+    string MachineName = Environment.MachineName;
+
+    //IP Address
+    string Address = getIP();
+
+    //Username
+    string UserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+
+    //Serial Number
+    string SerialNo = getSerialNo();
+
+    //Make and model
+    string MakeMod = getMakeAndModel();
+
+
+}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1">
+        Name of User: <input type="text" name="name" />
+        <br />
+        Last name: <input type="text" name="auditdoneby" />
+        <br />
+        Company name: <input type="text" name="compname" />
+        <br />
+        Position: <input type="text" name="position" />
+        <br /> <br />
+    </form>
+
+    <p id="mname"> Machine name: </p>
+    <p id="ipaddr"> IP Address: </p>
+    <p id="user"> Username: </p>
+    <p id="serial"> Serial Number: </p>
+    <p id="makemod"> Make and Model: </p>
+
+    <br />
+    <h4> Section 1</h4>
+    <hr />
+
+    <p id="mname"> Machine name: </p>
+    <p id="ipaddr"> IP Address: </p>
+
+
+</body>
+</html>
+
+<script>
+
+var machineName = '@MachineName';
+    document.getElementById('mname').innerHTML += machineName;
+
+var ipAddress = '@Address';
+    document.getElementById('ipaddr').innerHTML += ipAddress;
+
+    var userName = '@UserName';
+    document.getElementById('user').innerHTML += userName;
+
+    var serialNo = '@SerialNo';
+    document.getElementById('serial').innerHTML += serialNo;
+
+    var makeModel = '@MakeMod';
+    document.getElementById('makemod').innerHTML += makeModel;
+
+      var userName = '@UserName';
+    document.getElementById('user').innerHTML += userName;
+
+
+
+</script>
+
+
+
+
+
+
+
