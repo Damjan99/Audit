@@ -50,8 +50,8 @@
             foreach (ManagementObject mo in mc.GetInstances())
             {
                 // display general system information
-               sModel =  mo["Manufacturer"].ToString();
-               return sModel;
+                sModel = mo["Manufacturer"].ToString();
+                return sModel;
             }
         }
 
@@ -79,6 +79,10 @@
 
     //Make and model
     string MakeMod = getMakeAndModel();
+
+    //BIOS - Default
+    string BiosPass = "Yes";
+    string BiosHard = "Yes";
 
 
 }
@@ -109,9 +113,12 @@
     <h4> Section 1</h4>
     <hr />
 
-    <p id="mname"> Machine name: </p>
-    <p id="ipaddr"> IP Address: </p>
+    <p id="biospass">BIOS Password: </p>
+    <p id="bioshard">BIOS Hardening: </p>
 
+    <br />
+    <h4> Section 2</h4>
+    <hr />
 
 </body>
 </html>
@@ -133,8 +140,18 @@ var ipAddress = '@Address';
     var makeModel = '@MakeMod';
     document.getElementById('makemod').innerHTML += makeModel;
 
-      var userName = '@UserName';
+    var biosPass = '@BiosPass';
+    document.getElementById('biospass').innerHTML += biosPass;
+
+    var biosHard = '@BiosHard';
+    document.getElementById('bioshard').innerHTML += biosHard;
+
+      @*var userName = '@UserName';
     document.getElementById('user').innerHTML += userName;
+
+     var userName = '@UserName';
+    document.getElementById('user').innerHTML += userName;*@
+
 
 
 
