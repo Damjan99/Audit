@@ -14,6 +14,7 @@
 
 @functions
 {
+
     //IP Address
     string getIP()
     {
@@ -288,7 +289,7 @@
     public static string GetUsers()
     {
         string s = "";
-        SelectQuery sQuery = new SelectQuery("Win32_UserAccount", "Domain= 'ACTKPTP022'");
+        SelectQuery sQuery = new SelectQuery($"Win32_UserAccount", $"Domain='{Environment.MachineName}'");
 
         try
         {
@@ -330,6 +331,28 @@
             return true;
         }
     }
+    public static string GetUserName()
+    {
+        string s = "";
+        SelectQuery sQuery = new SelectQuery("Win32_UserAccount", $"Domain= '{Environment.MachineName}'");
+
+        try
+        {
+            ManagementObjectSearcher mSearcher = new ManagementObjectSearcher(sQuery);
+
+            foreach (ManagementObject mObject in mSearcher.Get())
+            {
+                s += mObject["Name"];
+
+                return s;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
+        return s;
+    }
 
     public static bool ShowIPStatistics(NetworkInterfaceComponent version)
     {
@@ -364,6 +387,51 @@
         string[] browserNames = browserKeys.GetSubKeyNames();
 
         return browserNames.Length > 0;
+    }
+
+    public static bool NumberOfUSBs()
+    {
+        var value = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\USBSTOR", "Start", null);
+        return Convert.ToInt32(value) > 0;
+    }
+
+    public static string MassStorageConnected()
+    {
+        string s = "";
+        var drives = DriveInfo.GetDrives()
+             .Where(drive => drive.IsReady && drive.DriveType == DriveType.Removable);
+
+        if (drives.Count() > 0)
+        {
+            s += "Yes: ";
+            foreach (var drive in drives)
+            {
+                s += drive + ", ";
+            }
+            return s;
+        }
+
+        else
+            return "No";
+    }
+
+    public static bool DetectMedia()
+    {
+        string username = GetUserName();
+        string picturePath = "C:/Users/" + username + "/Pictures/";
+        string musicPath = "C:/Users/" + username + "/Music/";
+        string videoPath = "C:/Users/" + username + "/Videos/";
+        if (Directory.Exists(picturePath) || Directory.Exists(musicPath) || Directory.Exists(videoPath))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static bool CD_NAS_Connected()
+    {
+        return DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.CDRom).Count() > 0;
     }
 
 }
@@ -558,6 +626,30 @@
 
     //Computer browser
     string Browser = InstalledBrowsers() ? "Start" : "Stop";
+
+    //USB port
+    string USB = NumberOfUSBs() ? "Yes" : "No";
+
+    //Wireless
+    string WirelessEnabled = CheckWirelessNWAdapter() ? "Yes" : "No";
+
+    //USB Based
+    string MassStorage = MassStorageConnected();
+
+    //Internet dongle (if there is wireless there is no dongle connected)
+    string Broadband = CheckWirelessNWAdapter() ? "No" : "Yes"; ;
+
+    //Mobile phone
+    string Mobile = "Cannot detect";
+
+    //Delete log
+    string DeleteLog = "Cannot access registry";
+
+    // Videos / Photos
+    string Media = DetectMedia() ? "Yes" : "No";
+
+    //CD/NAS
+    string CDNAS = CD_NAS_Connected() ? "Yes" : "No";
 }
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -597,10 +689,10 @@
     <hr />
 
     <p id="cardreader">Card reader disabled: </p>
-    <p id="wirelessnw">Wireless nw adapter disabled: </p>
-    <p id="multiplenw">Multiple nw card disabled: </p>
+    <p id="wirelessnw">Wireless network adapter disabled: </p>
+    <p id="multiplenw">Multiple network card disabled: </p>
     <p id="multiboot">Multiple booting disabled: </p>
-    <p id="wakeonlan">Wake on lan disabled: </p>
+    <p id="wakeonlan">Wake on LAN disabled: </p>
     <p id="chassis">Chassis intrution enabled: </p>
     <p id="biosver">Bios version: </p>
 
@@ -611,21 +703,21 @@
     <p id="winpass">Win Password enabled:  </p>
     <p id="screensaverpass">Screensaver password enabled:  </p>
     <p id="welcomescr">Welcome screen available: </p>
-    <p id="nolan">No of lan cards :  </p>
+    <p id="nolan">No of LAN cards :  </p>
     <p id="ipv6">IPV6 Disabled : </p>
     <p id="osdate">OS installed on date: </p>
     <p id="ospack">OS with service pack: </p>
-    <p id="nopatches">No of patches: </p>
-    <p id="lastupdate">Last Updated on: </p>
+    <p id="nopatches">Number of patches: </p>
+    <p id="lastupdate">Last updated on: </p>
     <p id="pirated">Pirated/Unactivated software: </p>
     <p id="avins">Antivirus installed:  </p>
     <p id="nameav">Name of antivirus: </p>
     <p id="avupd">Antivirus last updated on: </p>
     <p id="malware">Malware found:  </p>
     <p id="internet">Computer ever connected to internet:  </p>
-    <p id="active">Active Directory /Domain controller Implemented: </p>
+    <p id="active">Active Directory/Domain controller Implemented: </p>
     <p id="sccm">SCCM Installed:  </p>
-    <p id="firewall">Firewall installed /enabled (Windows/others):  </p>
+    <p id="firewall">Firewall installed/enabled (Windows/others):  </p>
     <p id="firecong">Firewall configured:  </p>
     <p id="encrypt">Encryption tool being used:  </p>
 
@@ -665,7 +757,7 @@
     <p id="remoteassist">Remote assistance (ticked):  </p>
     <p id="wireless">Wireless ('0' configured /auto configured) : </p>
     <p id="snmp">SNMP:  </p>
-    <p id="routing">Routing & rmote access:   </p>
+    <p id="routing">Routing & remote access:   </p>
     <p id="remotedesk">Remote desktop: :   </p>
     <p id="netmeeting">Netmeeting remote desktop sharing:  </p>
     <p id="iphelper">IP helper:    </p>
@@ -675,6 +767,16 @@
     <br />
     <h4> Section 7</h4>
     <hr /> <br />
+
+    <p id="usb">USB Port enabled:   </p>
+    <p id="wirelessen">Wireless enabled: (wifi/bluetooth):      </p>
+    <p id="mass">USB Based mass storage device used:     </p>
+    <p id="broadband">Internet dongle/broadband used:    </p>
+    <p id="mobile">Mobile phone installed/connected:    </p>
+    <p id="delete">Attempt to delete log & reg:  </p>
+    <p id="media">Videos/photos & songs exists:    </p>
+    <p id="cdnas">CD/NAS connected:  </p>
+    <br /> <br /> <br />
 
 </body>
 </html>
@@ -869,6 +971,30 @@ var ipAddress = '@Address';
 
      var browser = '@Browser';
     document.getElementById('browser').innerHTML += browser;
+
+      var usb = '@USB';
+    document.getElementById('usb').innerHTML += usb;
+
+    var wirelessEn = '@WirelessEnabled';
+    document.getElementById('wirelessen').innerHTML += wirelessEn;
+
+    var massStorage = '@MassStorage';
+    document.getElementById('mass').innerHTML += massStorage;
+
+    var broadband = '@Broadband';
+    document.getElementById('broadband').innerHTML += broadband;
+
+    var mobile = '@Mobile';
+    document.getElementById('mobile').innerHTML += mobile;
+
+    var deleteLog = '@DeleteLog';
+    document.getElementById('delete').innerHTML += deleteLog;
+
+     var media = '@Media';
+    document.getElementById('media').innerHTML += media;
+
+     var cdnas = '@CDNAS';
+    document.getElementById('cdnas').innerHTML += cdnas;
 
 
 </script>
