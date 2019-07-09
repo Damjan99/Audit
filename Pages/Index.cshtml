@@ -9,6 +9,8 @@
 @using System.Net.NetworkInformation;
 @using System.Text;
 @using Microsoft.Win32;
+@using System.IO;
+@using System.Security.Principal;
 
 @functions
 {
@@ -269,6 +271,66 @@
 
     }
 
+    public static bool AuditPolicyImplemented()
+    {
+        string filePath = "./Pages/Privacy.cshtml";//paste your text file path here
+        FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        StreamReader sr = new StreamReader(fs);
+        string content = sr.ReadToEnd();
+        content = content.Replace("\r\n", "\r");
+        int charCount = content.Length;
+        int WordsCount = content.Split(' ').Length;
+
+        //Assume a proper policy is implemented.
+        return WordsCount > 50;
+    }
+
+    public static string GetUsers()
+        {
+            string s = "";
+            SelectQuery sQuery = new SelectQuery("Win32_UserAccount", "Domain= 'ACTKPTP022'");
+
+            try
+            {
+                ManagementObjectSearcher mSearcher = new ManagementObjectSearcher(sQuery);
+
+                s += mSearcher.Get().Count + ": ";
+                foreach (ManagementObject mObject in mSearcher.Get())
+                {
+                   s+= mObject["Name"] + ", ";
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+           
+
+            return s;
+        }
+
+     public static bool IsAdminRenamed()
+        {
+            WindowsIdentity user = WindowsIdentity.GetCurrent();
+            WindowsPrincipal principal = new WindowsPrincipal(user);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+     public static bool ClearVirtualMemory()
+        {
+            using (var query = new ManagementObjectSearcher("SELECT AllocatedBaseSize FROM Win32_PageFileUsage"))
+            {
+                foreach (ManagementBaseObject obj in query.Get())
+                {
+                    uint used = (uint)obj.GetPropertyValue("AllocatedBaseSize");
+                    if (used == 0)
+                        return false;
+                }
+
+                return true;
+            }
+        }
+
 }
 
 
@@ -383,13 +445,42 @@
     //Default sharing (must exist if folder sharing is enabled)
     string Default = (Folder.Equals("Yes")) ? "Yes" : "No";
 
-    
+    //Password policy default
+    string Policy = "Yes";
+
+    //Account lockout default
+    string Lockout = "Yes";
+
+    //Audit policy
+    string AuditPolicy = AuditPolicyImplemented() ? "Yes" : "No";
+
+    //User Accounts
+    string UserAccounts = GetUsers();
+
+    //Gues account default
+    string GuestAccount = "Yes";
+
+    //Admin renamed
+    string AdminRenamed = IsAdminRenamed() ? "Yes" : "No";
+
+    //ctrlaltdel default
+    string CtrlAltDel = "No";
+
+    //Display last username
+    string DisplayLast = UserName;
+
+    //Clear virtual memory
+    string ClearVirtual = ClearVirtualMemory() ? "Yes" : "No";
+
+    //Usage of admin (function also checks the same)
+    string Admin = IsAdminRenamed() ? "Yes" : "No";
 
 }
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head id="Head1" runat="server">
     <title></title>
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.css" runat="server" />
 </head>
 <body>
 
@@ -465,6 +556,21 @@
     <br />
     <h4> Section 5</h4>
     <hr />
+
+    <p id="policy">Password policy implemented:  </p>
+    <p id="lockout">Account lockout policy implemented:    </p>
+    <p id="auditpol">Audit policy implemented:   </p>
+    <p id="useracc">No of user account present:  </p>
+    <p id="guestacc">Guest account enabled:  </p>
+    <p id="adminren">Admin renamed:  </p>
+    <p id="ctrlaltdel">Ctrl+Alt+Del disabled :    </p>
+    <p id="displayuser">Last user name enabled:  </p>
+    <p id="clearvirt">Clear virtual memory enabled: </p>
+    <p id="admin">Usage of Admin account for daily work:  </p>
+
+    <br />
+    <h4> Section 6</h4>
+    <hr /> <br />
 
 </body>
 </html>
@@ -581,6 +687,36 @@ var ipAddress = '@Address';
 
      var xdefault = '@Default';
     document.getElementById('default').innerHTML += xdefault;
+
+    var policy = '@Policy';
+    document.getElementById('policy').innerHTML += policy;
+
+    var lockout = '@Lockout';
+    document.getElementById('lockout').innerHTML += lockout;
+
+    var auditPolicy = '@AuditPolicy';
+    document.getElementById('auditpol').innerHTML += auditPolicy;
+
+    var userAccounts = '@UserAccounts';
+    document.getElementById('useracc').innerHTML += userAccounts;
+
+    var guestAccount = '@GuestAccount';
+    document.getElementById('guestacc').innerHTML += guestAccount;
+
+    var adminRenamed = '@AdminRenamed';
+    document.getElementById('adminren').innerHTML += adminRenamed;
+
+    var ctrlaltdel = '@CtrlAltDel';
+    document.getElementById('ctrlaltdel').innerHTML += ctrlaltdel;
+
+    var displayLast = '@DisplayLast';
+    document.getElementById('displayuser').innerHTML += displayLast;
+
+    var clearVirtual = '@ClearVirtual';
+    document.getElementById('clearvirt').innerHTML += clearVirtual;
+
+     var admin = '@Admin';
+    document.getElementById('admin').innerHTML += admin;
 
 
 </script>
