@@ -16,25 +16,13 @@ namespace Web_App
         public static void Main(string[] args)
         {
             CreateWebHostBuilder(args).Build().Run();
-
-
-
-            ManagementObjectSearcher MOS = new ManagementObjectSearcher("Select * From Win32_BaseBoard");
-
-                var arr = MOS.Get();
-                foreach (var item in arr)
-                {
-                    Console.WriteLine(item);
-                }
-
-
-    }
+        }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>();
 
 
-        
+
     }
 }

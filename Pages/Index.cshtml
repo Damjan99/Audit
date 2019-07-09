@@ -8,6 +8,7 @@
 @using System.Management;
 @using System.Net.NetworkInformation;
 @using System.Text;
+@using Microsoft.Win32;
 
 @functions
 {
@@ -142,7 +143,7 @@
         NetworkInterface[] adapters = NetworkInterface.GetAllNetworkInterfaces();
 
         if (adapters.Count() > 3)
-            return 3;
+            return 1;
 
         return adapters.Count();
     }
@@ -209,6 +210,44 @@
         }
 
         return string.Empty;
+    }
+
+    public static bool isFirewallEnabled()
+    {
+        try
+        {
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey("System\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\StandardProfile"))
+            {
+                if (key == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    Object o = key.GetValue("EnableFirewall");
+                    if (o == null)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        int firewall = (int)o;
+                        if (firewall == 1)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        catch
+        {
+            return false;
+        }
     }
 }
 
@@ -309,13 +348,14 @@
     string SCCM = "Yes";
 
     //Firewall
-    string Firewall = "";
+    string Firewall = isFirewallEnabled() ? "Yes" : "No";
 
     //Firewall configured
-    string FirewallConfig = "";
+    //If it it enables then it must be configured
+    string FirewallConfig = (Firewall.Equals("Yes")) ? "Yes" : "No";
 
-    //Encryption tool
-    string Encryption = "";
+    //Encryption tool default
+    string Encryption = "No";
 
 }
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -382,7 +422,7 @@
     <p id="malware">Malware found:  </p>
     <p id="internet">Computer ever connected to internet:  </p>
     <p id="active">Active Directory /Domain controller Implemented: </p>
-    <p id="sscm">SCCM Installed:  </p>
+    <p id="sccm">SCCM Installed:  </p>
     <p id="firewall">Firewall installed /enabled (Windows/others):  </p>
     <p id="firecong">Firewall configured:  </p>
     <p id="encrypt">Encryption tool being used:  </p>
