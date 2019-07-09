@@ -286,50 +286,85 @@
     }
 
     public static string GetUsers()
+    {
+        string s = "";
+        SelectQuery sQuery = new SelectQuery("Win32_UserAccount", "Domain= 'ACTKPTP022'");
+
+        try
         {
-            string s = "";
-            SelectQuery sQuery = new SelectQuery("Win32_UserAccount", "Domain= 'ACTKPTP022'");
+            ManagementObjectSearcher mSearcher = new ManagementObjectSearcher(sQuery);
 
-            try
+            s += mSearcher.Get().Count + ": ";
+            foreach (ManagementObject mObject in mSearcher.Get())
             {
-                ManagementObjectSearcher mSearcher = new ManagementObjectSearcher(sQuery);
-
-                s += mSearcher.Get().Count + ": ";
-                foreach (ManagementObject mObject in mSearcher.Get())
-                {
-                   s+= mObject["Name"] + ", ";
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-           
-
-            return s;
-        }
-
-     public static bool IsAdminRenamed()
-        {
-            WindowsIdentity user = WindowsIdentity.GetCurrent();
-            WindowsPrincipal principal = new WindowsPrincipal(user);
-            return principal.IsInRole(WindowsBuiltInRole.Administrator);
-        }
-
-     public static bool ClearVirtualMemory()
-        {
-            using (var query = new ManagementObjectSearcher("SELECT AllocatedBaseSize FROM Win32_PageFileUsage"))
-            {
-                foreach (ManagementBaseObject obj in query.Get())
-                {
-                    uint used = (uint)obj.GetPropertyValue("AllocatedBaseSize");
-                    if (used == 0)
-                        return false;
-                }
-
-                return true;
+                s += mObject["Name"] + ", ";
             }
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
+
+
+        return s;
+    }
+
+    public static bool IsAdminRenamed()
+    {
+        WindowsIdentity user = WindowsIdentity.GetCurrent();
+        WindowsPrincipal principal = new WindowsPrincipal(user);
+        return principal.IsInRole(WindowsBuiltInRole.Administrator);
+    }
+
+    public static bool ClearVirtualMemory()
+    {
+        using (var query = new ManagementObjectSearcher("SELECT AllocatedBaseSize FROM Win32_PageFileUsage"))
+        {
+            foreach (ManagementBaseObject obj in query.Get())
+            {
+                uint used = (uint)obj.GetPropertyValue("AllocatedBaseSize");
+                if (used == 0)
+                    return false;
+            }
+
+            return true;
+        }
+    }
+
+    public static bool ShowIPStatistics(NetworkInterfaceComponent version)
+    {
+        IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
+        IPGlobalStatistics ipstat = null;
+        switch (version)
+        {
+            case NetworkInterfaceComponent.IPv4:
+                ipstat = properties.GetIPv4GlobalStatistics();
+                Console.WriteLine("{0}IPv4 Statistics ", Environment.NewLine);
+                break;
+            case NetworkInterfaceComponent.IPv6:
+                ipstat = properties.GetIPv4GlobalStatistics();
+                Console.WriteLine("{0}IPv6 Statistics ", Environment.NewLine);
+                break;
+            default:
+                throw new ArgumentException("version");
+                //    break;
+        }
+        return ipstat.NumberOfRoutes > 0;
+
+    }
+
+    public static bool InstalledBrowsers()
+    {
+        RegistryKey browserKeys;
+        //on 64bit the browsers are in a different location
+        browserKeys = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\Clients\StartMenuInternet");
+        if (browserKeys == null)
+            browserKeys = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Clients\StartMenuInternet");
+
+        string[] browserNames = browserKeys.GetSubKeyNames();
+
+        return browserNames.Length > 0;
+    }
 
 }
 
@@ -475,6 +510,54 @@
     //Usage of admin (function also checks the same)
     string Admin = IsAdminRenamed() ? "Yes" : "No";
 
+    //Bluetooth default
+    string Bluetooth = "Start";
+
+    //FTP (Windows XP is deprecated)
+    string FTP = "Unknown";
+
+    //IIS Admin (Windows XP is deprecated)
+    string IISAdm = "Unknown";
+
+    //Remote auto connection
+    string Remote = "Start";
+
+    //Remote registry
+    string Registry = "Start";
+
+    //DEFAULTS
+    //SSDP
+    string SSDP = "Stop";
+
+    //Telnet
+    string Telnet = "Stop";
+
+    //Remote assistance
+    string RemoteAssist = "Stop";
+
+    //Wireless
+    string Wireless = CheckWirelessNWAdapter() ? "Start" : "Stop";
+
+    //SNMP
+    string SNMP = "Stop";
+
+    //Routing
+    string Routing = ShowIPStatistics(0) ? "Start" : "Stop";
+
+    //Remote Desktop
+    string RemoteDesktop = "Start";
+
+    //Netmeeting
+    string Netmeeting = "Stop";
+
+    //IP helper
+    string IPHelper = "Start";
+
+    //FAX
+    string FAX = "Start";
+
+    //Computer browser
+    string Browser = InstalledBrowsers() ? "Start" : "Stop";
 }
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -570,6 +653,27 @@
 
     <br />
     <h4> Section 6</h4>
+    <hr /> <br />
+
+    <p id="bluetooth">Bluetooth support services:  </p>
+    <p id="ftp">FTP Publishing (win xp):     </p>
+    <p id="iis">IIS Admin(win Xp):    </p>
+    <p id="remote">Remote auto connection manager:   </p>
+    <p id="registry">Remote registry:   </p>
+    <p id="ssdp">SSDP:  </p>
+    <p id="telnet">Telnet:    </p>
+    <p id="remoteassist">Remote assistance (ticked):  </p>
+    <p id="wireless">Wireless ('0' configured /auto configured) : </p>
+    <p id="snmp">SNMP:  </p>
+    <p id="routing">Routing & rmote access:   </p>
+    <p id="remotedesk">Remote desktop: :   </p>
+    <p id="netmeeting">Netmeeting remote desktop sharing:  </p>
+    <p id="iphelper">IP helper:    </p>
+    <p id="fax">FAX:  </p>
+    <p id="browser">Computer browser (standalone): </p>
+
+    <br />
+    <h4> Section 7</h4>
     <hr /> <br />
 
 </body>
@@ -717,6 +821,54 @@ var ipAddress = '@Address';
 
      var admin = '@Admin';
     document.getElementById('admin').innerHTML += admin;
+
+     var bluetooth = '@Bluetooth';
+    document.getElementById('bluetooth').innerHTML += bluetooth;
+
+    var ftp = '@FTP';
+    document.getElementById('ftp').innerHTML += ftp;
+
+    var iis = '@IISAdm';
+    document.getElementById('iis').innerHTML += iis;
+
+    var remote = '@Remote';
+    document.getElementById('remote').innerHTML += remote;
+
+    var registry = '@Registry';
+    document.getElementById('registry').innerHTML += registry;
+
+    var ssdp = '@SSDP';
+    document.getElementById('ssdp').innerHTML += ssdp;
+
+    var telnet = '@Telnet';
+    document.getElementById('telnet').innerHTML += telnet;
+
+    var remoteassist = '@RemoteAssist';
+    document.getElementById('remoteassist').innerHTML += remoteassist;
+
+     var wireless = '@Wireless';
+    document.getElementById('wireless').innerHTML += wireless;
+
+     var snmp = '@SNMP';
+    document.getElementById('snmp').innerHTML += snmp;
+
+     var routing = '@Routing';
+    document.getElementById('routing').innerHTML += routing;
+
+    var remoteDesk = '@RemoteDesktop';
+    document.getElementById('remotedesk').innerHTML += remoteDesk;
+
+    var netMeeting = '@Netmeeting';
+    document.getElementById('netmeeting').innerHTML += netMeeting;
+
+    var ipHelper = '@IPHelper';
+    document.getElementById('iphelper').innerHTML += ipHelper;
+
+     var fax = '@FAX';
+    document.getElementById('fax').innerHTML += fax;
+
+     var browser = '@Browser';
+    document.getElementById('browser').innerHTML += browser;
 
 
 </script>
