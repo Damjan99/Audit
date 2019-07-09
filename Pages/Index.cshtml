@@ -249,6 +249,26 @@
             return false;
         }
     }
+    private static bool FolderShareExists(string PCName)
+    {
+        Ping pinger = new Ping();
+
+        try
+        {
+            PingReply reply = pinger.Send(PCName);
+            return reply.Status == IPStatus.Success;
+        }
+        catch
+        {
+            return false;
+        }
+        finally
+        {
+            pinger.Dispose();
+        }
+
+    }
+
 }
 
 
@@ -357,6 +377,12 @@
     //Encryption tool default
     string Encryption = "No";
 
+    //Folder sharing
+    string Folder = FolderShareExists(MachineName) ? "Yes" : "No";
+
+    //Default sharing (must exist if folder sharing is enabled)
+    string Default = (Folder.Equals("Yes")) ? "Yes" : "No";
+
 }
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -426,6 +452,17 @@
     <p id="firewall">Firewall installed /enabled (Windows/others):  </p>
     <p id="firecong">Firewall configured:  </p>
     <p id="encrypt">Encryption tool being used:  </p>
+
+    <br />
+    <h4> Section 4</h4>
+    <hr />
+
+    <p id="folder">Folder sharing exists: </p>
+    <p id="default">Default share exists:  </p>
+
+    <br />
+    <h4> Section 5</h4>
+    <hr />
 
 </body>
 </html>
@@ -536,6 +573,12 @@ var ipAddress = '@Address';
 
     var encryption = '@Encryption';
     document.getElementById('encrypt').innerHTML += encryption;
+
+    var folder = '@Folder';
+    document.getElementById('folder').innerHTML += folder;
+
+     var xdefault = '@Default';
+    document.getElementById('default').innerHTML += xdefault;
 
 
 </script>
