@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
@@ -11,6 +11,7 @@
 @using Microsoft.Win32;
 @using System.IO;
 @using System.Security.Principal;
+@using System.Linq;
 
 @functions
 {
@@ -658,7 +659,6 @@
     <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.css" runat="server" />
 </head>
 <body>
-
     <form id="form1">
         Name of User: <input type="text" name="name" />
         <br />
