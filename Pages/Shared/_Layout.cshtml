@@ -136,8 +136,12 @@
             var company = document.getElementById('company').value;
             var position = document.getElementById('position').value;
 
-
-
+            if (name === "" || doneby === "" || company === "" || position === "") {
+                document.getElementById('fill').style.color = "red";
+                return;
+            }
+            fill.style.display = "none";
+            form.style.display = "none";
             button.style.display = "none";
             spin.style.display = "inline";
             load.innerHTML = "Auditing ...";
@@ -145,7 +149,6 @@
                 moreText.style.display = "inline";
                 spin.style.display = "none";
                 load.style.display = "none";
-                form.style.display = "none";
 
                 document.getElementById('displayname').innerHTML += name;
                 document.getElementById('displaydoneby').innerHTML += doneby;
@@ -158,6 +161,8 @@
 <body>
 
     <div class="container" id="firstdiv">
+        <br />
+        <h3 id="fill"> Please fill all of the data below: </h3>
         <form id="form1">
             <br /> <br />
             Name of User: <input type="text" id="name" name="name" style="margin-left:15px; width:150px;" />
@@ -199,14 +204,14 @@
         </header>
 
         <div class="container">
-        <br />
+            <br />
             <h4> User info: </h4>
             <br />
             <p id="displayname">Name of User: </p>
             <p id="displaydoneby">Audit done by: </p>
             <p id="displaycompany">Company name: </p>
             <p id="displayposition">Position: </p>
-        </div> <br /> <hr />
+        </div>  <hr />
 
         <div class="container">
             <partial name="_CookieConsentPartial" />
