@@ -660,112 +660,140 @@
 </head>
 <body>
    
-    <p id="mname"> PC name: </p>
-    <p id="ipaddr"> IP: </p>
-    <p id="macaddr">MAC Address: </p>
-    <p id="user"> Username: </p>
-    <p id="serial"> Serial Number: </p>
-    <p id="makemod"> Make and Model: </p>
-
+    <div class="port">
+        <p id="mname"> PC name: </p>
+        <p id="ipaddr"> IP: </p>
+        <p id="macaddr">MAC Address: </p>
+        <p id="user"> Username: </p>
+        <p id="serial"> Serial Number: </p>
+        <p id="makemod"> Make and Model: </p>
+    </div>
     <br />
-    <h4> Section 1</h4>
-    <hr />
+    <div class="section1">
+        <div class="part1">
+            <h4> Section 1</h4>
+            <hr />
 
-    <p id="biospass">BIOS Password: </p>
-    <p id="bioshard">BIOS Hardening: </p>
+            <p id="biospass">BIOS Password: </p>
+            <p id="bioshard">BIOS Hardening: </p>
+        </div>
 
+        <br />
+        <div class="part2">
+            <h4> Section 2</h4>
+            <hr />
+
+            <p id="cardreader">Card reader disabled: </p>
+            <p id="wirelessnw">Wireless network adapter disabled: </p>
+            <p id="multiplenw">Multiple network card disabled: </p>
+            <p id="multiboot">Multiple booting disabled: </p>
+            <p id="wakeonlan">Wake on LAN disabled: </p>
+            <p id="chassis">Chassis intrution enabled: </p>
+            <p id="biosver">Bios version: </p>
+        </div>
+    </div>
     <br />
-    <h4> Section 2</h4>
-    <hr />
 
-    <p id="cardreader">Card reader disabled: </p>
-    <p id="wirelessnw">Wireless network adapter disabled: </p>
-    <p id="multiplenw">Multiple network card disabled: </p>
-    <p id="multiboot">Multiple booting disabled: </p>
-    <p id="wakeonlan">Wake on LAN disabled: </p>
-    <p id="chassis">Chassis intrution enabled: </p>
-    <p id="biosver">Bios version: </p>
+    <div class="section2">
+        <div class="part3">
+            <h4> Section 3</h4>
+            <hr />
 
+            <p id="winpass">Win Password enabled:  </p>
+            <p id="screensaverpass">Screensaver password enabled:  </p>
+            <p id="welcomescr">Welcome screen available: </p>
+            <p id="nolan">No of LAN cards :  </p>
+            <p id="ipv6">IPV6 Disabled : </p>
+            <p id="osdate">OS installed on date: </p>
+            <p id="ospack">OS with service pack: </p>
+            <p id="nopatches">Number of patches: </p>
+            <p id="lastupdate">Last updated on: </p>
+            <p id="pirated">Pirated/Unactivated software: </p>
+            <p id="avins">Antivirus installed:  </p>
+            <p id="nameav">Name of antivirus: </p>
+            <p id="avupd">Antivirus last updated on: </p>
+            <p id="malware">Malware found:  </p>
+            <p id="internet">Computer ever connected to internet:  </p>
+            <p id="active">Active Directory/Domain controller Implemented: </p>
+            <p id="sccm">SCCM Installed:  </p>
+            <p id="firewall">Firewall installed/enabled (Windows/others):  </p>
+            <p id="firecong">Firewall configured:  </p>
+            <p id="encrypt">Encryption tool being used:  </p>
+
+        </div>
+
+        <br />
+
+
+        <div class="part4">
+            <h4 style="margin-right:145px;"> Section 4</h4>
+            <hr />
+
+            <p id="folder">Folder sharing exists: </p>
+            <p id="default">Default share exists:  </p>
+
+        </div>
+    </div>
     <br />
-    <h4> Section 3</h4>
-    <hr />
 
-    <p id="winpass">Win Password enabled:  </p>
-    <p id="screensaverpass">Screensaver password enabled:  </p>
-    <p id="welcomescr">Welcome screen available: </p>
-    <p id="nolan">No of LAN cards :  </p>
-    <p id="ipv6">IPV6 Disabled : </p>
-    <p id="osdate">OS installed on date: </p>
-    <p id="ospack">OS with service pack: </p>
-    <p id="nopatches">Number of patches: </p>
-    <p id="lastupdate">Last updated on: </p>
-    <p id="pirated">Pirated/Unactivated software: </p>
-    <p id="avins">Antivirus installed:  </p>
-    <p id="nameav">Name of antivirus: </p>
-    <p id="avupd">Antivirus last updated on: </p>
-    <p id="malware">Malware found:  </p>
-    <p id="internet">Computer ever connected to internet:  </p>
-    <p id="active">Active Directory/Domain controller Implemented: </p>
-    <p id="sccm">SCCM Installed:  </p>
-    <p id="firewall">Firewall installed/enabled (Windows/others):  </p>
-    <p id="firecong">Firewall configured:  </p>
-    <p id="encrypt">Encryption tool being used:  </p>
+    <div class="section3">
+        <div class="part5">
+            <h4> Section 5</h4>
+            <hr />
 
+            <p id="policy">Password policy implemented:  </p>
+            <p id="lockout">Account lockout policy implemented:    </p>
+            <p id="auditpol">Audit policy implemented:   </p>
+            <p id="useracc">No of user account present:  </p>
+            <p id="guestacc">Guest account enabled:  </p>
+            <p id="adminren">Admin renamed:  </p>
+            <p id="ctrlaltdel">Ctrl+Alt+Del disabled :    </p>
+            <p id="displayuser">Last user name enabled:  </p>
+            <p id="clearvirt">Clear virtual memory enabled: </p>
+            <p id="admin">Usage of Admin account for daily work:  </p>
+
+        </div>
+        <br />
+
+        <div class="part6">
+            <h4> Section 6</h4>
+            <hr /><br />
+
+            <p id="bluetooth">Bluetooth support services:  </p>
+            <p id="ftp">FTP Publishing (win xp):     </p>
+            <p id="iis">IIS Admin(win Xp):    </p>
+            <p id="remote">Remote auto connection manager:   </p>
+            <p id="registry">Remote registry:   </p>
+            <p id="ssdp">SSDP:  </p>
+            <p id="telnet">Telnet:    </p>
+            <p id="remoteassist">Remote assistance (ticked):  </p>
+            <p id="wireless">Wireless ('0' configured /auto configured) : </p>
+            <p id="snmp">SNMP:  </p>
+            <p id="routing">Routing & remote access:   </p>
+            <p id="remotedesk">Remote desktop: :   </p>
+            <p id="netmeeting">Netmeeting remote desktop sharing:  </p>
+            <p id="iphelper">IP helper:    </p>
+            <p id="fax">FAX:  </p>
+            <p id="browser">Computer browser (standalone): </p>
+
+        </div>
+    </div>
     <br />
-    <h4> Section 4</h4>
-    <hr />
 
-    <p id="folder">Folder sharing exists: </p>
-    <p id="default">Default share exists:  </p>
+    <div class="part7">
+        <h4> Section 7</h4>
+        <hr /> <br />
 
-    <br />
-    <h4> Section 5</h4>
-    <hr />
+        <p id="usb">USB Port enabled:   </p>
+        <p id="wirelessen">Wireless enabled: (wifi/bluetooth):      </p>
+        <p id="mass">USB Based mass storage device used:     </p>
+        <p id="broadband">Internet dongle/broadband used:    </p>
+        <p id="mobile">Mobile phone installed/connected:    </p>
+        <p id="delete">Attempt to delete log & reg:  </p>
+        <p id="media">Videos/photos & songs exists:    </p>
+        <p id="cdnas">CD/NAS connected:  </p>
 
-    <p id="policy">Password policy implemented:  </p>
-    <p id="lockout">Account lockout policy implemented:    </p>
-    <p id="auditpol">Audit policy implemented:   </p>
-    <p id="useracc">No of user account present:  </p>
-    <p id="guestacc">Guest account enabled:  </p>
-    <p id="adminren">Admin renamed:  </p>
-    <p id="ctrlaltdel">Ctrl+Alt+Del disabled :    </p>
-    <p id="displayuser">Last user name enabled:  </p>
-    <p id="clearvirt">Clear virtual memory enabled: </p>
-    <p id="admin">Usage of Admin account for daily work:  </p>
-
-    <br />
-    <h4> Section 6</h4>
-    <hr /> <br />
-
-    <p id="bluetooth">Bluetooth support services:  </p>
-    <p id="ftp">FTP Publishing (win xp):     </p>
-    <p id="iis">IIS Admin(win Xp):    </p>
-    <p id="remote">Remote auto connection manager:   </p>
-    <p id="registry">Remote registry:   </p>
-    <p id="ssdp">SSDP:  </p>
-    <p id="telnet">Telnet:    </p>
-    <p id="remoteassist">Remote assistance (ticked):  </p>
-    <p id="wireless">Wireless ('0' configured /auto configured) : </p>
-    <p id="snmp">SNMP:  </p>
-    <p id="routing">Routing & remote access:   </p>
-    <p id="remotedesk">Remote desktop: :   </p>
-    <p id="netmeeting">Netmeeting remote desktop sharing:  </p>
-    <p id="iphelper">IP helper:    </p>
-    <p id="fax">FAX:  </p>
-    <p id="browser">Computer browser (standalone): </p>
-
-    <br />
-    <h4> Section 7</h4>
-    <hr /> <br />
-
-    <p id="usb">USB Port enabled:   </p>
-    <p id="wirelessen">Wireless enabled: (wifi/bluetooth):      </p>
-    <p id="mass">USB Based mass storage device used:     </p>
-    <p id="broadband">Internet dongle/broadband used:    </p>
-    <p id="mobile">Mobile phone installed/connected:    </p>
-    <p id="delete">Attempt to delete log & reg:  </p>
-    <p id="media">Videos/photos & songs exists:    </p>
-    <p id="cdnas">CD/NAS connected:  </p>
+    </div>
     <br /> <br /> <br />
 
 </body>
