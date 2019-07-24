@@ -97,9 +97,12 @@
 
         #blue1{
            color:cornflowerblue;
-
         }
 
+        input
+        {
+            width:120px;
+        }
     </style>
 
     <environment include="Development">
@@ -120,6 +123,7 @@
             var button = document.getElementById('click');
             var spin = document.getElementById('spin');
             var load = document.getElementById('load');
+            var form = document.getElementById('firstdiv');
             button.style.display = "none";
             spin.style.display = "inline";
             load.innerHTML = "Auditing ...";
@@ -127,12 +131,28 @@
                 moreText.style.display = "inline";
                 spin.style.display = "none";
                 load.style.display = "none";
+                form.style.display = "none";
 
             }, 5000);
         }
 /**/</script>
 </head>
 <body>
+  
+    <div class="container" id="firstdiv">
+        <form id="form1">
+            <br /> <br />
+            Name of User: <input type="text" name="name" style="margin-left:15px; width:150px;" />
+            <br /> <br />
+            Audit done by: <input type="text" name="auditdoneby" style="margin-left:15px; width:150px;" />
+            <br /><br />
+            Company name: <input type="text" name="compname" style="margin-left:5px; width:150px;" />
+            <br /><br />
+            Position: <input type="text" name="position" style="margin-left:60px; width:150px;" />
+            <br /> <br />
+        </form> <br />
+    </div> 
+
     <button onclick="display()" id="click">Start Audit</button>
     <button id="spin" style="display:none;"></button>
     <p id="load"></p>
